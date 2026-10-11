@@ -1,0 +1,15 @@
+# 前端构建上下文排除
+web/node_modules
+web/dist
+# 后端构建上下文排除（fastapi-app/Dockerfile 所在目录）
+fastapi-app/.venv
+fastapi-app/**/__pycache__
+**/__pycache__
+*.pyc
+.git
+logs
+run
+gui-test-screenshots
+docs
+*.bat
+*.sh

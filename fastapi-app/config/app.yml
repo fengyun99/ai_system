@@ -1,0 +1,67 @@
+# ============================================================
+# AI 智能客服系统（Python 版）统一配置
+# 敏感值统一 Java 同款 SM4-CTR Enc[...] 密文；
+# 明文填写首次启动自动加密回写（python -m app.core.config_cli 可手工生成）
+# ============================================================
+
+decrypt:
+  # 与 Java SM4Utils.DEFAULT_KEY 一致，勿改（改动将无法互认旧密文）
+  key: Q1w2e3r4t5y6u7i8
+
+server:
+  host: 127.0.0.1
+  port: 9310
+
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  database: ai_system
+  user: root
+  password: Enc[0dgJCfpWF+MaXdU44UKiBA==]
+
+es:
+  host: 127.0.0.1
+  port: 9200
+  # 本机 ES 8 开启 TLS（xpack.security.http.ssl），须走 https + 自签证书免校验
+  scheme: https
+  username: ai_system
+  password: Enc[+tc4PusnZp1ZTtER/WE=]
+  index: ai_kb
+  # 向量维度须与 embeddings 模型一致（qwen3.7-text-embedding = 1024）
+  vector_dims: 1024
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password:
+
+jwt:
+  # 与原 Java token.secret 相同，迁移账号令牌语义一致
+  secret: Enc[yt8RMOttM8sMecQ3/mKlPG8+4FELfdAoJ4bCnW9sFg==]
+  expire_minutes: 720
+
+rag:
+  chat_key: deepseek
+  embeddings_key: embeddings
+  # rerank_key 已随 qwen key 一并移除：重排不可用时自动回退 RRF 融合序（设计语义，不阻塞回答）
+  top_k: 6
+  candidate_pool: 30
+  rrf_k: 60
+  rerank_timeout_ms: 3000
+  max_sub_queries: 4
+  # 联网补充：知识库不足时联网兜底
+  web_on_insufficient: true
+  # 外地区问题：直接联网回答（关闭则拒答）
+  web_external_region: true
+
+# 自建联网检索服务（SearXNG 协议兼容；换真 SearXNG 只需改 base_url）
+websearch:
+  enabled: true
+  base_url: http://127.0.0.1:8888
+  engines: bing,sogou
+  limit: 6
+  timeout_ms: 15000
+
+mcp:
+  # 工具服务挂载路径（同进程 streamable-http）
+  mount_path: /mcp

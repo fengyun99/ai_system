@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+logs/
+*.log
+
+# 前端
+web/node_modules/
+web/dist/
+
+# 本地覆盖配置（含明文密钥时勿提交）
+config/app.local.yml
+docs/

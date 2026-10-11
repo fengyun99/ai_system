@@ -1,0 +1,57 @@
+# ============================================================
+# Docker 专用配置（容器网络内服务名主机，由 AI_APP_CONFIG 指定加载）
+# 敏感值保持 Enc[...]；ES 容器关闭 http TLS（容器网内通信）
+# ============================================================
+
+decrypt:
+  key: Q1w2e3r4t5y6u7i8
+
+server:
+  host: 0.0.0.0
+  port: 9310
+
+mysql:
+  host: mysql
+  port: 3306
+  database: ai_system
+  user: root
+  password: Enc[0dgJCfpWF+MaXdU44UKiBA==]
+
+es:
+  host: es
+  port: 9200
+  scheme: http
+  username: elastic
+  password: Enc[+tc4PusnZp1ZTtER/WE=]
+  index: ai_kb
+  vector_dims: 1024
+
+redis:
+  host: redis
+  port: 6379
+  password:
+
+jwt:
+  secret: Enc[yt8RMOttM8sMecQ3/mKlPG8+4FELfdAoJ4bCnW9sFg==]
+  expire_minutes: 720
+
+rag:
+  chat_key: deepseek
+  embeddings_key: embeddings
+  top_k: 6
+  candidate_pool: 30
+  rrf_k: 60
+  rerank_timeout_ms: 3000
+  max_sub_queries: 4
+  web_on_insufficient: true
+  web_external_region: true
+
+websearch:
+  enabled: true
+  base_url: http://search:8888
+  engines: bing,sogou
+  limit: 6
+  timeout_ms: 15000
+
+mcp:
+  mount_path: /mcp

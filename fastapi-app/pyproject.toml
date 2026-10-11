@@ -1,0 +1,55 @@
+[project]
+name = "ai-system"
+version = "1.0.0"
+description = "AI 智能客服系统（FastAPI + LangGraph Agentic RAG + MCP + ES 混合检索）"
+requires-python = ">=3.12"
+dependencies = [
+    # Web 框架
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sse-starlette>=2.1",
+    "python-multipart",
+    # ORM + MySQL 异步驱动
+    "tortoise-orm[aiomysql]>=0.21",
+    "aiomysql>=0.2",
+    # Redis（会话/停止信号）
+    "redis>=5.0",
+    # 向量与检索（ES 混合检索）
+    "elasticsearch>=8.11,<9",
+    # LLM / Agent
+    "langgraph>=0.2.60",
+    "langchain>=0.3",
+    "langchain-openai>=0.2",
+    "openai>=1.50",
+    "mcp>=1.2",
+    "langchain-mcp-adapters>=0.1",
+    # 工具
+    "pyjwt>=2.9",
+    "lxml>=5.2",
+    "cssselect>=1.2",
+    "pyyaml>=6.0",
+    "tzdata",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+    "httpx>=0.27",
+    "jieba>=0.42",
+    "loguru>=0.7",
+    "python-docx>=1.1",
+    "openpyxl>=3.1",
+]
+
+[tool.uv]
+# 与 requirements.txt 的清华镜像保持一致（国内加速）
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

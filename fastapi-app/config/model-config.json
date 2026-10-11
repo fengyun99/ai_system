@@ -1,0 +1,26 @@
+[
+  {
+    "key": "deepseek",
+    "base_url": "https://api.deepseek.com/v1",
+    "api_key": [
+      "Enc[yNVGJa9zYp0KPsQi7GahcT82oAJQcokleJLYxyd5QiS7S4w=]"
+    ],
+    "model": "deepseek-flash",
+    "price": {
+      "input": 0.0005,
+      "output": 0.002
+    }
+  },
+  {
+    "key": "embeddings",
+    "base_url": "https://llm-feuko8uy8q23a293.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+    "api_key": [
+      "Enc[yNVGMOs4HoE/R/AF002Xa2kp3H5IWf4SCL/+kUh0PwOtDYsL0Wp1U6U1bk3KFAbXbmEBeACX4iaCp50av+KWNxQ9Ty6wAcJn2+42m2A77SCTxTMofT9uzdTeMUQG5SbrUj+olVqxcKZSmKrjY/61Tb5lGg8=]"
+    ],
+    "model": "qwen3.7-text-embedding",
+    "price": {
+      "input": 0.0005,
+      "output": 0
+    }
+  }
+]

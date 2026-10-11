@@ -1,0 +1,112 @@
+# AI 智能客服系统 —— Docker Compose 一键编排
+# 用法：docker compose up -d --build
+#   前端     http://127.0.0.1:8081     （nginx，/api /mcp 反代后端）
+#   后端     http://127.0.0.1:9310     （开放接口 /api/open/v1/*，MCP /mcp）
+#   检索服务 容器内 search:8888（SearXNG 协议，供后端联网兜底）
+#   基础设施 mysql/redis/es 仅容器网内互通（调试可解开下方 ports 注释）
+name: ai-system
+
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: jfbNbCALuVwykGeA
+      MYSQL_DATABASE: ai_system
+      TZ: Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pjfbNbCALuVwykGeA"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    # ports: ["127.0.0.1:3306:3306"]   # 调试用
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.22
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"   # 容器网内通信走 http，保留账号密码
+      ELASTIC_PASSWORD: AiSys2026EsPwd
+      ES_JAVA_OPTS: "-Xms1g -Xmx2g"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs -u elastic:AiSys2026EsPwd http://127.0.0.1:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    # ports: ["127.0.0.1:9200:9200"]   # 调试用
+
+  # 一次性初始化：建表 + 种子（RBAC/知识/工具/流程/接入方）+ 知识入库 ES（幂等）
+  init:
+    build:
+      context: ./fastapi-app
+      dockerfile: Dockerfile
+    command: ["python", "scripts/init_db.py"]
+    environment:
+      AI_APP_CONFIG: app.docker.yml
+    volumes:
+      - ./docker/app.docker.yml:/app/config/app.docker.yml:ro
+      - ./fastapi-app/config/model-config.json:/app/config/model-config.json:ro
+    depends_on:
+      mysql: { condition: service_healthy }
+      es: { condition: service_healthy }
+    restart: "no"
+
+  backend:
+    build:
+      context: ./fastapi-app
+      dockerfile: Dockerfile
+    environment:
+      AI_APP_CONFIG: app.docker.yml
+    volumes:
+      - ./docker/app.docker.yml:/app/config/app.docker.yml:ro
+      - ./fastapi-app/config/model-config.json:/app/config/model-config.json:ro
+    ports:
+      - "9310:9310"
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      es: { condition: service_healthy }
+      init: { condition: service_completed_successfully }
+    restart: unless-stopped
+
+  search:
+    build:
+      context: ./fastapi-app
+      dockerfile: Dockerfile
+    command: ["python", "-m", "uvicorn", "search_service.main:app", "--host", "0.0.0.0", "--port", "8888"]
+    ports:
+      - "8888:8888"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+  es_data:
